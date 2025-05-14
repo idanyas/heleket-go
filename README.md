@@ -1,10 +1,10 @@
-# Cryptomus API Go Wrapper
+# Heleket API Go Wrapper
 
-This repository contains an **unofficial Go wrapper** for the Cryptomus API, a crypto payment gateway. This wrapper simplifies the process of integrating Cryptomus functionality into your Go projects.
+This repository contains an **unofficial Go wrapper** for the Heleket API, a crypto payment gateway. This wrapper simplifies the process of integrating Heleket functionality into your Go projects.
 
 ## Features
 
-- Easy-to-use Go interface for Cryptomus API
+- Easy-to-use Go interface for Heleket API
 - Supports payment and payout operations
 - Handles static wallet functionalities
 - Supports refund operations
@@ -14,10 +14,10 @@ This repository contains an **unofficial Go wrapper** for the Cryptomus API, a c
 
 ## Installation
 
-To install the Cryptomus API Go wrapper, use `go get`:
+To install the Heleket API Go wrapper, use `go get`:
 
 ```
-go get github.com/itsjoniur/go-cryptomus
+go get github.com/rmilansky/go-heleket
 ```
 
 ## Usage
@@ -28,24 +28,24 @@ Here's a quick example of how to use the wrapper:
 
 import (
     "fmt"
-    "github.com/itsjoniur/go-cryptomus"
+    "github.com/rmilansky/go-heleket"
 )
 
 func main() {
     httpClient := http.DefaultClient
-    client := cryptomus.New(httpClient, "your-merchant-id", "your-payment-api-key", "your-payout-api-key")
+    client := heleket.New(httpClient, "your-merchant-id", "your-payment-api-key", "your-payout-api-key")
     
     // Create an invoice
-    invoiceReq := &cryptomus.InvoiceRequest{
+    invoiceReq := &heleket.InvoiceRequest{
         Amount: "10",
         Currency: "USD",
         OrderId: "your-order-id",
-        InvoiceRequestOptions: &cryptomus.invoiceRequestOptions{
+        InvoiceRequestOptions: &heleket.invoiceRequestOptions{
             Network: "tron",
             UrlCallback: "https://yourdomain.com/callback"
         },
     }
-    invoice, err := cryptomus.CreateInvoice(invoiceReq)
+    invoice, err := heleket.CreateInvoice(invoiceReq)
     if err != nil {
         // Handle error
     }
@@ -56,7 +56,7 @@ func main() {
 
 ## API Coverage
 
-This wrapper currently supports the following Cryptomus API functionalities:
+This wrapper currently supports the following Heleket API functionalities:
 
 - Payment operations
 - Static wallet operations

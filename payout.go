@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"encoding/json"
@@ -97,7 +97,7 @@ type payoutServiceListRawResponse struct {
 	State  int8             `json:"state"`
 }
 
-func (c *Cryptomus) CreatePayout(payoutReq *PayoutRequest) (*Payout, error) {
+func (c *Heleket) CreatePayout(payoutReq *PayoutRequest) (*Payout, error) {
 	res, err := c.fetch("POST", createPayoutEndpoint, payoutReq)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (c *Cryptomus) CreatePayout(payoutReq *PayoutRequest) (*Payout, error) {
 	return response.Result, nil
 }
 
-func (c *Cryptomus) GetPayoutInfo(payoutInfoReq *PayoutInfoRequest) (*Payout, error) {
+func (c *Heleket) GetPayoutInfo(payoutInfoReq *PayoutInfoRequest) (*Payout, error) {
 	if payoutInfoReq.PayoutUUID == "" || payoutInfoReq.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [PayoutUUID, OrderId]")
 	}
@@ -131,7 +131,7 @@ func (c *Cryptomus) GetPayoutInfo(payoutInfoReq *PayoutInfoRequest) (*Payout, er
 	return response.Result, nil
 }
 
-func (c *Cryptomus) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistoryResponse, error) {
+func (c *Heleket) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistoryResponse, error) {
 	payload := map[string]any{"date_from": dateFrom, "date_to": dateTo}
 	res, err := c.fetch("POST", payoutHistoryEndpoint, payload)
 	if err != nil {
@@ -152,7 +152,7 @@ func (c *Cryptomus) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistory
 	return payoutHistory, nil
 }
 
-func (c *Cryptomus) GetPayoutServicesList() ([]*PayoutService, error) {
+func (c *Heleket) GetPayoutServicesList() ([]*PayoutService, error) {
 	payload := make(map[string]any)
 	res, err := c.fetch("POST", payoutServicesListEndpoint, payload)
 	if err != nil {

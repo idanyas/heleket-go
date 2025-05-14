@@ -1,25 +1,24 @@
 package tests
 
 import (
+	"github.com/rmilansky/go-heleket"
 	"testing"
 	"time"
-
-	"github.com/itsjoniur/go-cryptomus"
 
 	"github.com/stretchr/testify/require"
 )
 
-func createTestInvoice(t *testing.T) *cryptomus.Payment {
-	invoiceReq := &cryptomus.InvoiceRequest{
+func createTestInvoice(t *testing.T) *heleket.Payment {
+	invoiceReq := &heleket.InvoiceRequest{
 		Amount:   "10",
 		Currency: "USD",
 		OrderId:  "xxy",
-		InvoiceRequestOptions: &cryptomus.InvoiceRequestOptions{
+		InvoiceRequestOptions: &heleket.InvoiceRequestOptions{
 			Network:     "tron",
-			UrlCallback: "https://example.com/cryptomus/callback",
+			UrlCallback: "https://example.com/heleket/callback",
 		},
 	}
-	invoice, err := TestCryptomus.CreateInvoice(invoiceReq)
+	invoice, err := TestHeleket.CreateInvoice(invoiceReq)
 	require.NoError(t, err)
 	require.NotEmpty(t, invoice)
 
@@ -32,20 +31,20 @@ func TestCreateInvoice(t *testing.T) {
 
 func TestGenerateInvoiceQRCode(t *testing.T) {
 	invoice := createTestInvoice(t)
-	qrCode, err := TestCryptomus.GeneratePaymentQRCode(invoice.UUID)
+	qrCode, err := TestHeleket.GeneratePaymentQRCode(invoice.UUID)
 	require.NoError(t, err)
 	require.NotEmpty(t, qrCode)
 }
 
 func TestGetPaymentInfo(t *testing.T) {
 	invoice := createTestInvoice(t)
-	payment, err := TestCryptomus.GetPaymentInfo(&cryptomus.PaymentInfoRequest{PaymentUUID: invoice.UUID})
+	payment, err := TestHeleket.GetPaymentInfo(&heleket.PaymentInfoRequest{PaymentUUID: invoice.UUID})
 	require.NoError(t, err)
 	require.NotEmpty(t, payment)
 }
 
 func TestGeyPaymentHistory(t *testing.T) {
-	payments, err := TestCryptomus.GetPaymentHistory(time.Now(), time.Now())
+	payments, err := TestHeleket.GetPaymentHistory(time.Now(), time.Now())
 	require.NoError(t, err)
 	require.NotEmpty(t, payments)
 }

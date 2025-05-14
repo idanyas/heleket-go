@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"encoding/json"
@@ -132,7 +132,7 @@ type paymentServiceListRawResponse struct {
 	State  int8              `json:"state"`
 }
 
-func (c *Cryptomus) CreateInvoice(invoiceReq *InvoiceRequest) (*Payment, error) {
+func (c *Heleket) CreateInvoice(invoiceReq *InvoiceRequest) (*Payment, error) {
 	res, err := c.fetch("POST", createInvoiceEndpoit, invoiceReq)
 	if err != nil {
 		return nil, err
@@ -148,7 +148,7 @@ func (c *Cryptomus) CreateInvoice(invoiceReq *InvoiceRequest) (*Payment, error) 
 	return response.Result, nil
 }
 
-func (c *Cryptomus) GeneratePaymentQRCode(paymentUUID string) (string, error) {
+func (c *Heleket) GeneratePaymentQRCode(paymentUUID string) (string, error) {
 	payload := map[string]any{"merchant_payment_uuid": paymentUUID}
 	res, err := c.fetch("POST", generateInvoiceQRCodeEndpoint, payload)
 	if err != nil {
@@ -166,7 +166,7 @@ func (c *Cryptomus) GeneratePaymentQRCode(paymentUUID string) (string, error) {
 
 }
 
-func (c *Cryptomus) GetPaymentInfo(paymentInfoReq *PaymentInfoRequest) (*Payment, error) {
+func (c *Heleket) GetPaymentInfo(paymentInfoReq *PaymentInfoRequest) (*Payment, error) {
 	if paymentInfoReq.PaymentUUID == "" || paymentInfoReq.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [PaymentUUID, OrderId]")
 	}
@@ -186,7 +186,7 @@ func (c *Cryptomus) GetPaymentInfo(paymentInfoReq *PaymentInfoRequest) (*Payment
 	return response.Result, nil
 }
 
-func (c *Cryptomus) GetPaymentHistory(dateFrom, dateTo time.Time) (*PaymentHistoryResponse, error) {
+func (c *Heleket) GetPaymentHistory(dateFrom, dateTo time.Time) (*PaymentHistoryResponse, error) {
 	payload := map[string]any{"date_from": dateFrom, "date_to": dateTo}
 	res, err := c.fetch("POST", paymentHistoryEndpoint, payload)
 	if err != nil {
@@ -207,7 +207,7 @@ func (c *Cryptomus) GetPaymentHistory(dateFrom, dateTo time.Time) (*PaymentHisto
 	return paymentHistory, nil
 }
 
-func (c *Cryptomus) GetPaymentServicesList() ([]*PaymentService, error) {
+func (c *Heleket) GetPaymentServicesList() ([]*PaymentService, error) {
 	payload := make(map[string]any)
 	res, err := c.fetch("POST", paymentServicesListEndpoint, payload)
 	if err != nil {

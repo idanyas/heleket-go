@@ -1,4 +1,4 @@
-module github.com/itsjoniur/go-cryptomus
+module github.com/rmilansky/go-heleket
 
 go 1.21.3
 

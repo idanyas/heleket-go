@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"encoding/json"
@@ -64,7 +64,7 @@ type TestWebhookResponse struct {
 	State  int8     `json:"state"`
 }
 
-func (c *Cryptomus) ParseWebhook(reqBody []byte, verifySign bool) (*Webhook, error) {
+func (c *Heleket) ParseWebhook(reqBody []byte, verifySign bool) (*Webhook, error) {
 	var apiKey string
 	response := &Webhook{}
 
@@ -92,7 +92,7 @@ func (c *Cryptomus) ParseWebhook(reqBody []byte, verifySign bool) (*Webhook, err
 	return response, err
 }
 
-func (c *Cryptomus) ResendWebhook(resendRequest *ResendWebhookRequest) (bool, error) {
+func (c *Heleket) ResendWebhook(resendRequest *ResendWebhookRequest) (bool, error) {
 	if resendRequest.PaymentUUID == "" || resendRequest.OrderId == "" {
 		return false, errors.New("you should pass one of required values [PaymentUUID, OrderId]")
 	}
@@ -112,7 +112,7 @@ func (c *Cryptomus) ResendWebhook(resendRequest *ResendWebhookRequest) (bool, er
 	return len(response.Result) == 0, nil
 }
 
-func (c *Cryptomus) TestPaymentWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
+func (c *Heleket) TestPaymentWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
 	res, err := c.fetch("POST", testPaymentWebhookEndpoint, testRequest)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (c *Cryptomus) TestPaymentWebhook(testRequest *TestWebhookRequest) (*TestWe
 	return response, nil
 }
 
-func (c *Cryptomus) TestPayoutWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
+func (c *Heleket) TestPayoutWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
 	res, err := c.fetch("POST", testPayoutWebhookEndpoint, testRequest)
 	if err != nil {
 		return nil, err

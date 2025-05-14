@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"bytes"
@@ -6,17 +6,17 @@ import (
 	"net/http"
 )
 
-const APIURL = "https://api.cryptomus.com/v1"
+const apiUrl = "https://api.heleket.com/v1"
 
-type Cryptomus struct {
+type Heleket struct {
 	merchant      string
 	paymentApiKey string
 	payoutApiKey  string
 	client        *http.Client
 }
 
-func New(client *http.Client, merchant, paymentApiKey, payoutApiKey string) *Cryptomus {
-	return &Cryptomus{
+func New(client *http.Client, merchant, paymentApiKey, payoutApiKey string) *Heleket {
+	return &Heleket{
 		client:        client,
 		merchant:      merchant,
 		paymentApiKey: paymentApiKey,
@@ -24,14 +24,14 @@ func New(client *http.Client, merchant, paymentApiKey, payoutApiKey string) *Cry
 	}
 }
 
-func (c *Cryptomus) fetch(method string, endpoint string, payload any) (*http.Response, error) {
+func (c *Heleket) fetch(method string, endpoint string, payload any) (*http.Response, error) {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
 
 	sign := c.signRequest(c.paymentApiKey, body)
-	req, err := http.NewRequest(method, APIURL+endpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequest(method, apiUrl+endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}

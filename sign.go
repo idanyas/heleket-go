@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"crypto/md5"
@@ -8,13 +8,13 @@ import (
 	"errors"
 )
 
-func (c *Cryptomus) signRequest(apiKey string, reqBody []byte) string {
+func (c *Heleket) signRequest(apiKey string, reqBody []byte) string {
 	data := base64.StdEncoding.EncodeToString(reqBody)
 	hash := md5.Sum([]byte(data + apiKey))
 	return hex.EncodeToString(hash[:])
 }
 
-func (c *Cryptomus) VerifySign(apiKey string, reqBody []byte) error {
+func (c *Heleket) VerifySign(apiKey string, reqBody []byte) error {
 	var jsonBody map[string]any
 	err := json.Unmarshal(reqBody, &jsonBody)
 	if err != nil {

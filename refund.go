@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"encoding/json"
@@ -38,7 +38,7 @@ type blockedAddressRefundRawResponse struct {
 	State  int8                          `json:"state"`
 }
 
-func (c *Cryptomus) Refund(refundRequest *RefundRequest) (bool, error) {
+func (c *Heleket) Refund(refundRequest *RefundRequest) (bool, error) {
 	res, err := c.fetch("POST", refundEndpoint, refundRequest)
 	if err != nil {
 		return false, err
@@ -54,7 +54,7 @@ func (c *Cryptomus) Refund(refundRequest *RefundRequest) (bool, error) {
 	return len(response.Result) == 0, nil
 }
 
-func (c *Cryptomus) BlockedAddressRefund(refundRequest *BlockedAddressRefundRequest) (*BlockedAddressRefundResponse, error) {
+func (c *Heleket) BlockedAddressRefund(refundRequest *BlockedAddressRefundRequest) (*BlockedAddressRefundResponse, error) {
 	if refundRequest.WalletUUID == "" || refundRequest.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [WalletUUID, OrderId]")
 	}

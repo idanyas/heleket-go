@@ -1,4 +1,4 @@
-package cryptomus
+package heleket
 
 import (
 	"encoding/json"
@@ -61,7 +61,7 @@ type blockAddressRawResponse struct {
 	State  int8
 }
 
-func (c *Cryptomus) CreateStaticWallet(staticWalletReq *StaticWalletRequest) (*StaticWalletResponse, error) {
+func (c *Heleket) CreateStaticWallet(staticWalletReq *StaticWalletRequest) (*StaticWalletResponse, error) {
 	res, err := c.fetch("POST", createStaticWalletEndpoint, staticWalletReq)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (c *Cryptomus) CreateStaticWallet(staticWalletReq *StaticWalletRequest) (*S
 	return response.Result, nil
 }
 
-func (c *Cryptomus) GenerateStaticWalletQRCode(walletUUID string) (string, error) {
+func (c *Heleket) GenerateStaticWalletQRCode(walletUUID string) (string, error) {
 	payload := map[string]any{"wallet_address_uuid": walletUUID}
 	res, err := c.fetch("POST", generateStaticWalletQRCodeEndpoint, payload)
 	if err != nil {
@@ -94,7 +94,7 @@ func (c *Cryptomus) GenerateStaticWalletQRCode(walletUUID string) (string, error
 	return response.Result.Image, nil
 }
 
-func (c *Cryptomus) BlockAddress(blockAddressReq *BlockAddressRequest) (*BlockAddressResponse, error) {
+func (c *Heleket) BlockAddress(blockAddressReq *BlockAddressRequest) (*BlockAddressResponse, error) {
 	if blockAddressReq.WalletUUID == "" || blockAddressReq.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [WalletUUID, OrderId]")
 	}

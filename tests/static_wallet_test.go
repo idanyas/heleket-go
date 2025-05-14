@@ -1,24 +1,23 @@
 package tests
 
 import (
+	"github.com/rmilansky/go-heleket"
 	"testing"
-
-	"github.com/itsjoniur/go-cryptomus"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreateStaticWallet(t *testing.T) {
-	staticWalletReq := &cryptomus.StaticWalletRequest{
+	staticWalletReq := &heleket.StaticWalletRequest{
 		Currency: "TRX",
 		Network:  "tron",
 		OrderId:  "xxx",
-		StaticWalletRequestOptions: &cryptomus.StaticWalletRequestOptions{
-			UrlCallback: "https://example.com/cryptomus/callback",
+		StaticWalletRequestOptions: &heleket.StaticWalletRequestOptions{
+			UrlCallback: "https://example.com/heleket/callback",
 		},
 	}
 
-	staticWallet, err := TestCryptomus.CreateStaticWallet(staticWalletReq)
+	staticWallet, err := TestHeleket.CreateStaticWallet(staticWalletReq)
 	require.NoError(t, err)
 	require.NotEmpty(t, staticWallet)
 }
