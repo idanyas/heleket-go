@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/idanyas/go-heleket"
+	"github.com/idanyas/heleket-go"
 )
 
 // RunPayoutExamples executes all examples related to the Payout API.

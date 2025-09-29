@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/idanyas/go-heleket"
+	"github.com/idanyas/heleket-go"
 )
 
 var TestHeleket *heleket.Heleket

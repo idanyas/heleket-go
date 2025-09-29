@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/idanyas/go-heleket"
+	"github.com/idanyas/heleket-go"
 
 	"github.com/stretchr/testify/require"
 )

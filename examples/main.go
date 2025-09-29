@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/idanyas/go-heleket"
+	"github.com/idanyas/heleket-go"
 )
 
 var (

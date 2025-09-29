@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/idanyas/go-heleket"
+	"github.com/idanyas/heleket-go"
 )
 
 // A sample webhook payload from the Heleket documentation.

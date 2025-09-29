@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/idanyas/go-heleket"
+	"github.com/idanyas/heleket-go"
 )
 
 // RunRefundExamples executes examples for refunding payments.
