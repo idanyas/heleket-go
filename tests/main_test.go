@@ -1,10 +1,11 @@
 package tests
 
 import (
-	"github.com/rmilansky/go-heleket"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/idanyas/go-heleket"
 )
 
 var TestHeleket *heleket.Heleket

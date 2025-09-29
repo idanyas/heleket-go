@@ -1,9 +1,10 @@
 package tests
 
 import (
-	"github.com/rmilansky/go-heleket"
 	"testing"
 	"time"
+
+	"github.com/idanyas/go-heleket"
 
 	"github.com/stretchr/testify/require"
 )
@@ -44,7 +45,7 @@ func TestGetPaymentInfo(t *testing.T) {
 }
 
 func TestGeyPaymentHistory(t *testing.T) {
-	payments, err := TestHeleket.GetPaymentHistory(time.Now(), time.Now())
+	payments, err := TestHeleket.GetPaymentHistory(time.Now(), time.Now(), "")
 	require.NoError(t, err)
 	require.NotEmpty(t, payments)
 }

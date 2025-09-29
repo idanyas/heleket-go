@@ -75,11 +75,11 @@ type payoutHistoryRawResponse struct {
 }
 
 type PayoutService struct {
-	Network     string                  `json:"network"`
-	Currency    string                  `json:"currency"`
-	IsAvailable bool                    `json:"isAvailable"`
-	Limit       *PayoutServiceLimit     `json:"limit"`
-	Commision   *PayoutServiceCommision `json:"commision"`
+	Network     string                   `json:"network"`
+	Currency    string                   `json:"currency"`
+	IsAvailable bool                     `json:"isAvailable"`
+	Limit       *PayoutServiceLimit      `json:"limit"`
+	Commission  *PayoutServiceCommission `json:"commission"`
 }
 
 type PayoutServiceLimit struct {
@@ -87,7 +87,7 @@ type PayoutServiceLimit struct {
 	MaxAmount string `json:"maxAmount"`
 }
 
-type PayoutServiceCommision struct {
+type PayoutServiceCommission struct {
 	FeeAmount string `json:"feeAmount"`
 	Percent   string `json:"percent"`
 }
@@ -98,7 +98,7 @@ type payoutServiceListRawResponse struct {
 }
 
 func (c *Heleket) CreatePayout(payoutReq *PayoutRequest) (*Payout, error) {
-	res, err := c.fetch("POST", createPayoutEndpoint, payoutReq)
+	res, err := c.fetch("POST", createPayoutEndpoint, payoutReq, c.payoutApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -113,11 +113,11 @@ func (c *Heleket) CreatePayout(payoutReq *PayoutRequest) (*Payout, error) {
 }
 
 func (c *Heleket) GetPayoutInfo(payoutInfoReq *PayoutInfoRequest) (*Payout, error) {
-	if payoutInfoReq.PayoutUUID == "" || payoutInfoReq.OrderId == "" {
+	if payoutInfoReq.PayoutUUID == "" && payoutInfoReq.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [PayoutUUID, OrderId]")
 	}
 
-	res, err := c.fetch("POST", payoutInfoEndpoint, payoutInfoReq)
+	res, err := c.fetch("POST", payoutInfoEndpoint, payoutInfoReq, c.payoutApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (c *Heleket) GetPayoutInfo(payoutInfoReq *PayoutInfoRequest) (*Payout, erro
 
 func (c *Heleket) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistoryResponse, error) {
 	payload := map[string]any{"date_from": dateFrom, "date_to": dateTo}
-	res, err := c.fetch("POST", payoutHistoryEndpoint, payload)
+	res, err := c.fetch("POST", payoutHistoryEndpoint, payload, c.payoutApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (c *Heleket) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistoryRe
 
 func (c *Heleket) GetPayoutServicesList() ([]*PayoutService, error) {
 	payload := make(map[string]any)
-	res, err := c.fetch("POST", payoutServicesListEndpoint, payload)
+	res, err := c.fetch("POST", payoutServicesListEndpoint, payload, c.payoutApiKey)
 	if err != nil {
 		return nil, err
 	}

@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"github.com/rmilansky/go-heleket"
 	"testing"
+
+	"github.com/idanyas/go-heleket"
 
 	"github.com/stretchr/testify/require"
 )

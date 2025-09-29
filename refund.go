@@ -15,6 +15,7 @@ type RefundRequest struct {
 	IsSubtract  bool   `json:"is_subtract"`
 	PaymentUUID string `json:"uuid,omitempty"`
 	OrderId     string `json:"order_id,omitempty"`
+	Amount      string `json:"amount,omitempty"`
 }
 
 type refundRawResponse struct {
@@ -29,8 +30,8 @@ type BlockedAddressRefundRequest struct {
 }
 
 type BlockedAddressRefundResponse struct {
-	Commision string `json:"commision"`
-	Amount    string `json:"amount"`
+	Commission string `json:"commission"`
+	Amount     string `json:"amount"`
 }
 
 type blockedAddressRefundRawResponse struct {
@@ -39,7 +40,7 @@ type blockedAddressRefundRawResponse struct {
 }
 
 func (c *Heleket) Refund(refundRequest *RefundRequest) (bool, error) {
-	res, err := c.fetch("POST", refundEndpoint, refundRequest)
+	res, err := c.fetch("POST", refundEndpoint, refundRequest, c.paymentApiKey)
 	if err != nil {
 		return false, err
 	}
@@ -55,11 +56,11 @@ func (c *Heleket) Refund(refundRequest *RefundRequest) (bool, error) {
 }
 
 func (c *Heleket) BlockedAddressRefund(refundRequest *BlockedAddressRefundRequest) (*BlockedAddressRefundResponse, error) {
-	if refundRequest.WalletUUID == "" || refundRequest.OrderId == "" {
+	if refundRequest.WalletUUID == "" && refundRequest.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [WalletUUID, OrderId]")
 	}
 
-	res, err := c.fetch("POST", blockedAddressRefundEndpoint, refundRequest)
+	res, err := c.fetch("POST", blockedAddressRefundEndpoint, refundRequest, c.paymentApiKey)
 	if err != nil {
 		return nil, err
 	}

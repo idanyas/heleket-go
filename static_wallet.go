@@ -62,7 +62,7 @@ type blockAddressRawResponse struct {
 }
 
 func (c *Heleket) CreateStaticWallet(staticWalletReq *StaticWalletRequest) (*StaticWalletResponse, error) {
-	res, err := c.fetch("POST", createStaticWalletEndpoint, staticWalletReq)
+	res, err := c.fetch("POST", createStaticWalletEndpoint, staticWalletReq, c.paymentApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *Heleket) CreateStaticWallet(staticWalletReq *StaticWalletRequest) (*Sta
 
 func (c *Heleket) GenerateStaticWalletQRCode(walletUUID string) (string, error) {
 	payload := map[string]any{"wallet_address_uuid": walletUUID}
-	res, err := c.fetch("POST", generateStaticWalletQRCodeEndpoint, payload)
+	res, err := c.fetch("POST", generateStaticWalletQRCodeEndpoint, payload, c.paymentApiKey)
 	if err != nil {
 		return "", err
 	}
@@ -95,11 +95,11 @@ func (c *Heleket) GenerateStaticWalletQRCode(walletUUID string) (string, error) 
 }
 
 func (c *Heleket) BlockAddress(blockAddressReq *BlockAddressRequest) (*BlockAddressResponse, error) {
-	if blockAddressReq.WalletUUID == "" || blockAddressReq.OrderId == "" {
+	if blockAddressReq.WalletUUID == "" && blockAddressReq.OrderId == "" {
 		return nil, errors.New("you should pass one of required values [WalletUUID, OrderId]")
 	}
 
-	res, err := c.fetch("POST", blockWalletAddressEndpoint, blockAddressReq)
+	res, err := c.fetch("POST", blockWalletAddressEndpoint, blockAddressReq, c.paymentApiKey)
 	if err != nil {
 		return nil, err
 	}

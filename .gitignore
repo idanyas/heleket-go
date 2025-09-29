@@ -21,3 +21,6 @@
 go.work
 
 .idea/
+
+output_*.md
+output.md

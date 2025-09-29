@@ -93,11 +93,11 @@ func (c *Heleket) ParseWebhook(reqBody []byte, verifySign bool) (*Webhook, error
 }
 
 func (c *Heleket) ResendWebhook(resendRequest *ResendWebhookRequest) (bool, error) {
-	if resendRequest.PaymentUUID == "" || resendRequest.OrderId == "" {
+	if resendRequest.PaymentUUID == "" && resendRequest.OrderId == "" {
 		return false, errors.New("you should pass one of required values [PaymentUUID, OrderId]")
 	}
 
-	res, err := c.fetch("POST", resendWebhookEndpoint, resendRequest)
+	res, err := c.fetch("POST", resendWebhookEndpoint, resendRequest, c.paymentApiKey)
 	if err != nil {
 		return false, err
 	}
@@ -113,7 +113,7 @@ func (c *Heleket) ResendWebhook(resendRequest *ResendWebhookRequest) (bool, erro
 }
 
 func (c *Heleket) TestPaymentWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
-	res, err := c.fetch("POST", testPaymentWebhookEndpoint, testRequest)
+	res, err := c.fetch("POST", testPaymentWebhookEndpoint, testRequest, c.paymentApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (c *Heleket) TestPaymentWebhook(testRequest *TestWebhookRequest) (*TestWebh
 }
 
 func (c *Heleket) TestPayoutWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
-	res, err := c.fetch("POST", testPayoutWebhookEndpoint, testRequest)
+	res, err := c.fetch("POST", testPayoutWebhookEndpoint, testRequest, c.payoutApiKey)
 	if err != nil {
 		return nil, err
 	}

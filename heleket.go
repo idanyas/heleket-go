@@ -3,6 +3,7 @@ package heleket
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
@@ -24,14 +25,29 @@ func New(client *http.Client, merchant, paymentApiKey, payoutApiKey string) *Hel
 	}
 }
 
-func (c *Heleket) fetch(method string, endpoint string, payload any) (*http.Response, error) {
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
+func (c *Heleket) fetch(method string, endpoint string, payload any, apiKey string) (*http.Response, error) {
+	var body []byte
+	var err error
+
+	// For GET requests, payload should be nil. Signature is on an empty string.
+	// For POST requests with no parameters, payload should be an empty map or struct, which marshals to "{}".
+	if payload != nil {
+		body, err = json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		body = []byte("")
 	}
 
-	sign := c.signRequest(c.paymentApiKey, body)
-	req, err := http.NewRequest(method, apiUrl+endpoint, bytes.NewBuffer(body))
+	sign := c.signRequest(apiKey, body)
+
+	var reqBody io.Reader
+	if method != http.MethodGet {
+		reqBody = bytes.NewBuffer(body)
+	}
+
+	req, err := http.NewRequest(method, apiUrl+endpoint, reqBody)
 	if err != nil {
 		return nil, err
 	}
