@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 )
 
 // signRequest generates a signature for the request body according to Heleket's algorithm:
@@ -17,19 +18,24 @@ func (c *Heleket) signRequest(apiKey string, reqBody []byte) string {
 	return hex.EncodeToString(hash[:])
 }
 
-// VerifySign verifies the webhook signature according to Heleket's algorithm:
-// 1. Parse the webhook JSON
-// 2. Extract and remove the 'sign' field
-// 3. Re-encode the remaining data to JSON (without 'sign')
-// 4. Generate signature: MD5(base64(json_without_sign) + apiKey)
-// 5. Compare with the extracted signature using constant-time comparison
+// VerifySign verifies the webhook signature according to Heleket's algorithm.
+//
+// The signature verification must preserve the exact JSON formatting (including key order)
+// that Heleket used when generating the signature. This implementation uses raw string
+// manipulation to remove the 'sign' field without re-marshaling, which would change key order.
+//
+// Algorithm:
+// 1. Extract the 'sign' field value from the webhook JSON
+// 2. Remove the '"sign":"value"' entry from the raw JSON string (preserving all other formatting)
+// 3. Generate signature: MD5(base64(json_without_sign) + apiKey)
+// 4. Compare with the extracted signature using constant-time comparison
 //
 // This matches Heleket's PHP implementation:
 // $sign = $data['sign'];
 // unset($data['sign']);
 // $hash = md5(base64_encode(json_encode($data, JSON_UNESCAPED_UNICODE)) . $apiPaymentKey);
 func (c *Heleket) VerifySign(apiKey string, reqBody []byte) error {
-	// Parse the webhook body into a map
+	// First, parse to extract the signature value
 	var jsonBody map[string]any
 	if err := json.Unmarshal(reqBody, &jsonBody); err != nil {
 		return fmt.Errorf("invalid JSON: %w", err)
@@ -37,23 +43,33 @@ func (c *Heleket) VerifySign(apiKey string, reqBody []byte) error {
 
 	// Extract the signature from the webhook
 	reqSign, ok := jsonBody["sign"].(string)
-	if !ok {
+	if !ok || reqSign == "" {
 		return errors.New("missing or invalid 'sign' field in webhook")
 	}
 
-	// Remove the 'sign' field before computing the expected signature
-	delete(jsonBody, "sign")
+	// Remove the "sign" field from the raw JSON string using regex
+	// This preserves the exact formatting and key order of the original payload
+	//
+	// Pattern explanation:
+	// "sign"\s*:\s*"(?:[^"\\]|\\.)*"\s*,?\s*
+	// - "sign"                    : literal "sign" key
+	// - \s*:\s*                   : colon with optional whitespace
+	// - "(?:[^"\\]|\\.)*"         : JSON string value with proper escape handling
+	//   - (?:...)                 : non-capturing group
+	//   - [^"\\]                  : match any char except " or \
+	//   - |                       : OR
+	//   - \\.                     : match backslash followed by any char (handles escapes)
+	//   - *                       : repeat zero or more times
+	// - \s*,?\s*                  : optional trailing comma with whitespace
+	signPattern := regexp.MustCompile(`"sign"\s*:\s*"(?:[^"\\]|\\.)*"\s*,?\s*`)
+	bodyWithoutSign := signPattern.ReplaceAll(reqBody, []byte{})
 
-	// Re-encode the body without the 'sign' field
-	// Go's json.Marshal produces the correct format that matches Heleket's server:
-	// - No escaped forward slashes (unlike PHP's default json_encode)
-	// - No escaped Unicode (matches PHP's JSON_UNESCAPED_UNICODE flag)
-	bodyWithoutSign, err := json.Marshal(jsonBody)
-	if err != nil {
-		return fmt.Errorf("failed to re-encode JSON: %w", err)
-	}
+	// Clean up any trailing commas that might be left after removing "sign"
+	// This handles cases like: {"a":"b","sign":"x",} -> {"a":"b",}
+	bodyWithoutSign = regexp.MustCompile(`,\s*}`).ReplaceAll(bodyWithoutSign, []byte("}"))
+	bodyWithoutSign = regexp.MustCompile(`,\s*]`).ReplaceAll(bodyWithoutSign, []byte("]"))
 
-	// Generate the expected signature
+	// Generate the expected signature using the cleaned raw JSON
 	expectedSign := c.signRequest(apiKey, bodyWithoutSign)
 
 	// Use constant-time comparison to prevent timing attacks
