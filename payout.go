@@ -3,6 +3,7 @@ package heleket
 import (
 	"encoding/json"
 	"errors"
+	"net/url"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type PayoutRequest struct {
 	Address    string `json:"address"`
 	IsSubtract bool   `json:"is_subtract"`
 	Network    string `json:"network"`
+	*PayoutRequestOptions
 }
 
 type PayoutRequestOptions struct {
@@ -69,26 +71,28 @@ type PayoutHistoryPaginate struct {
 }
 
 type payoutHistoryRawResponse struct {
-	State    int8                   `json:"state"`
-	Result   []*Payout              `json:"result"`
-	Paginate *PayoutHistoryPaginate `json:"paginate"`
+	State  int8 `json:"state"`
+	Result struct {
+		Items    []*Payout              `json:"items"`
+		Paginate *PayoutHistoryPaginate `json:"paginate"`
+	} `json:"result"`
 }
 
 type PayoutService struct {
 	Network     string                   `json:"network"`
 	Currency    string                   `json:"currency"`
-	IsAvailable bool                     `json:"isAvailable"`
+	IsAvailable bool                     `json:"is_available"`
 	Limit       *PayoutServiceLimit      `json:"limit"`
 	Commission  *PayoutServiceCommission `json:"commission"`
 }
 
 type PayoutServiceLimit struct {
-	MinAmount string `json:"minAmount"`
-	MaxAmount string `json:"maxAmount"`
+	MinAmount string `json:"min_amount"`
+	MaxAmount string `json:"max_amount"`
 }
 
 type PayoutServiceCommission struct {
-	FeeAmount string `json:"feeAmount"`
+	FeeAmount string `json:"fee_amount"`
 	Percent   string `json:"percent"`
 }
 
@@ -131,9 +135,16 @@ func (c *Heleket) GetPayoutInfo(payoutInfoReq *PayoutInfoRequest) (*Payout, erro
 	return response.Result, nil
 }
 
-func (c *Heleket) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistoryResponse, error) {
-	payload := map[string]any{"date_from": dateFrom, "date_to": dateTo}
-	res, err := c.fetch("POST", payoutHistoryEndpoint, payload, c.payoutApiKey)
+func (c *Heleket) GetPayoutHistory(dateFrom, dateTo time.Time, cursor string) (*PayoutHistoryResponse, error) {
+	const timeFormat = "2006-01-02 15:04:05"
+	payload := map[string]any{"date_from": dateFrom.Format(timeFormat), "date_to": dateTo.Format(timeFormat)}
+
+	endpoint := payoutHistoryEndpoint
+	if cursor != "" {
+		endpoint += "?cursor=" + url.QueryEscape(cursor)
+	}
+
+	res, err := c.fetch("POST", endpoint, payload, c.payoutApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +156,8 @@ func (c *Heleket) GetPayoutHistory(dateFrom, dateTo time.Time) (*PayoutHistoryRe
 	}
 
 	payoutHistory := &PayoutHistoryResponse{
-		Payouts:  response.Result,
-		Paginate: response.Paginate,
+		Payouts:  response.Result.Items,
+		Paginate: response.Result.Paginate,
 	}
 
 	return payoutHistory, nil

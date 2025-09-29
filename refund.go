@@ -40,6 +40,10 @@ type blockedAddressRefundRawResponse struct {
 }
 
 func (c *Heleket) Refund(refundRequest *RefundRequest) (bool, error) {
+	if refundRequest.PaymentUUID == "" && refundRequest.OrderId == "" {
+		return false, errors.New("you should pass one of required values [PaymentUUID, OrderId]")
+	}
+
 	res, err := c.fetch("POST", refundEndpoint, refundRequest, c.paymentApiKey)
 	if err != nil {
 		return false, err

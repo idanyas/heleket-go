@@ -51,10 +51,20 @@ func RunWebhookExamples() {
 	log.Println("\n3. Resending a webhook...")
 	resendWebhook("some-order-id") // Replace with a real order ID
 
+	// Use a service like https://webhook.site to get a test URL
+	testWebhookURL := "https://webhook.site/your-unique-url"
+
 	// 4. Send a test payment webhook to a specified URL.
 	log.Println("\n4. Sending a test payment webhook...")
-	// Use a service like https://webhook.site to get a test URL
-	testPaymentWebhook("https://webhook.site/your-unique-url")
+	testPaymentWebhook(testWebhookURL)
+
+	// 5. Send a test payout webhook to a specified URL.
+	log.Println("\n5. Sending a test payout webhook...")
+	testPayoutWebhook(testWebhookURL)
+
+	// 6. Send a test static wallet webhook to a specified URL.
+	log.Println("\n6. Sending a test static wallet webhook...")
+	testWalletWebhook(testWebhookURL)
 }
 
 // parseWebhook shows how to parse a raw webhook body and optionally verify its signature.
@@ -95,5 +105,39 @@ func testPaymentWebhook(callbackURL string) {
 		return
 	}
 	log.Println("Test payment webhook sent successfully:")
+	prettyPrint(response)
+}
+
+// testPayoutWebhook sends a simulated payout webhook to your endpoint for testing.
+func testPayoutWebhook(callbackURL string) {
+	req := &heleket.TestWebhookRequest{
+		UrlCallback: callbackURL,
+		Currency:    "USDT",
+		Network:     "tron",
+		Status:      "paid",
+	}
+	response, err := client.TestPayoutWebhook(req)
+	if err != nil {
+		log.Printf("TestPayoutWebhook failed: %v", err)
+		return
+	}
+	log.Println("Test payout webhook sent successfully:")
+	prettyPrint(response)
+}
+
+// testWalletWebhook sends a simulated wallet webhook to your endpoint for testing.
+func testWalletWebhook(callbackURL string) {
+	req := &heleket.TestWebhookRequest{
+		UrlCallback: callbackURL,
+		Currency:    "USDT",
+		Network:     "tron",
+		Status:      "paid",
+	}
+	response, err := client.TestWalletWebhook(req)
+	if err != nil {
+		log.Printf("TestWalletWebhook failed: %v", err)
+		return
+	}
+	log.Println("Test wallet webhook sent successfully:")
 	prettyPrint(response)
 }

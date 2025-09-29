@@ -44,6 +44,9 @@ func createPayout() (*heleket.Payout, error) {
 		OrderId:    fmt.Sprintf("payout-%d", time.Now().Unix()),
 		Address:    "TTEtddVZyNtLD9wbq4PzomjBhtxenSMXbb", // Use a valid recipient address
 		IsSubtract: true,                                 // Commission will be subtracted from the amount
+		PayoutRequestOptions: &heleket.PayoutRequestOptions{
+			UrlCallback: "https://your-backend.com/webhook/payout",
+		},
 	}
 
 	payout, err := client.CreatePayout(req)
@@ -75,13 +78,25 @@ func getPayoutInfo(uuid, orderID string) {
 func getPayoutHistory() {
 	dateTo := time.Now()
 	dateFrom := dateTo.Add(-24 * time.Hour)
-	history, err := client.GetPayoutHistory(dateFrom, dateTo)
+	history, err := client.GetPayoutHistory(dateFrom, dateTo, "")
 	if err != nil {
 		log.Printf("GetPayoutHistory failed: %v", err)
 		return
 	}
-	log.Println("Successfully retrieved payout history:")
+	log.Println("Successfully retrieved payout history (first page):")
 	prettyPrint(history)
+
+	// Example of fetching the next page using the cursor
+	if history.Paginate != nil && history.Paginate.HasPages && history.Paginate.NextCursor != "" {
+		log.Println("\nFetching next page of payout history...")
+		nextPageHistory, err := client.GetPayoutHistory(dateFrom, dateTo, history.Paginate.NextCursor)
+		if err != nil {
+			log.Printf("GetPayoutHistory (next page) failed: %v", err)
+			return
+		}
+		log.Println("Successfully retrieved next page:")
+		prettyPrint(nextPageHistory)
+	}
 }
 
 // getPayoutServices lists all available currencies and networks for payouts.

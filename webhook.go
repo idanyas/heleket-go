@@ -9,6 +9,7 @@ const (
 	resendWebhookEndpoint      = "/payment/resend"
 	testPaymentWebhookEndpoint = "/test-webhook/payment"
 	testPayoutWebhookEndpoint  = "/test-webhook/payout"
+	testWalletWebhookEndpoint  = "/test-webhook/wallet"
 )
 
 type WebhookConvert struct {
@@ -74,7 +75,7 @@ func (c *Heleket) ParseWebhook(reqBody []byte, verifySign bool) (*Webhook, error
 	}
 
 	switch response.Type {
-	case "payment":
+	case "payment", "wallet":
 		apiKey = c.paymentApiKey
 	case "payout":
 		apiKey = c.payoutApiKey
@@ -130,6 +131,22 @@ func (c *Heleket) TestPaymentWebhook(testRequest *TestWebhookRequest) (*TestWebh
 
 func (c *Heleket) TestPayoutWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
 	res, err := c.fetch("POST", testPayoutWebhookEndpoint, testRequest, c.payoutApiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	response := &TestWebhookResponse{}
+	if err = json.NewDecoder(res.Body).Decode(response); err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (c *Heleket) TestWalletWebhook(testRequest *TestWebhookRequest) (*TestWebhookResponse, error) {
+	res, err := c.fetch("POST", testWalletWebhookEndpoint, testRequest, c.paymentApiKey)
 	if err != nil {
 		return nil, err
 	}

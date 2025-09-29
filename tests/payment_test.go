@@ -44,7 +44,7 @@ func TestGetPaymentInfo(t *testing.T) {
 	require.NotEmpty(t, payment)
 }
 
-func TestGeyPaymentHistory(t *testing.T) {
+func TestGetPaymentHistory(t *testing.T) {
 	payments, err := TestHeleket.GetPaymentHistory(time.Now(), time.Now(), "")
 	require.NoError(t, err)
 	require.NotEmpty(t, payments)

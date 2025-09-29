@@ -126,18 +126,18 @@ type paymentHistoryRawResponse struct {
 type PaymentService struct {
 	Network     string                    `json:"network"`
 	Currency    string                    `json:"currency"`
-	IsAvailable bool                      `json:"isAvailable"`
+	IsAvailable bool                      `json:"is_available"`
 	Limit       *PaymentServiceLimit      `json:"limit"`
 	Commission  *PaymentServiceCommission `json:"commission"`
 }
 
 type PaymentServiceLimit struct {
-	MinAmount string `json:"minAmount"`
-	MaxAmount string `json:"maxAmount"`
+	MinAmount string `json:"min_amount"`
+	MaxAmount string `json:"max_amount"`
 }
 
 type PaymentServiceCommission struct {
-	FeeAmount string `json:"feeAmount"`
+	FeeAmount string `json:"fee_amount"`
 	Percent   string `json:"percent"`
 }
 
@@ -201,7 +201,9 @@ func (c *Heleket) GetPaymentInfo(paymentInfoReq *PaymentInfoRequest) (*Payment, 
 }
 
 func (c *Heleket) GetPaymentHistory(dateFrom, dateTo time.Time, cursor string) (*PaymentHistoryResponse, error) {
-	payload := map[string]any{"date_from": dateFrom, "date_to": dateTo}
+	const timeFormat = "2006-01-02 15:04:05"
+	payload := map[string]any{"date_from": dateFrom.Format(timeFormat), "date_to": dateTo.Format(timeFormat)}
+
 	endpoint := paymentHistoryEndpoint
 	if cursor != "" {
 		endpoint += "?cursor=" + url.QueryEscape(cursor)
